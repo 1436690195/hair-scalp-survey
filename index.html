@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>头发与头皮健康问卷调查</title>
+<style>
+  :root {
+    --bg: #f5f1eb;
+    --card: #ffffff;
+    --primary: #6b4c3b;
+    --accent: #c8956c;
+    --text: #3d2c24;
+    --muted: #8b7355;
+    --border: #e0d5c7;
+    --success: #7a9e7e;
+    --danger: #c0392b;
+    --shadow: 0 4px 24px rgba(60, 30, 10, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── 顶部装饰 ── */
+  .hero {
+    text-align: center;
+    padding: 48px 24px 32px;
+    background: linear-gradient(135deg, #3d2c24 0%, #6b4c3b 40%, #8b6914 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .hero h1 { font-size: 2rem; font-weight: 700; letter-spacing: 2px; }
+  .hero p  { margin-top: 8px; opacity: 0.8; font-size: 0.95rem; }
+
+  /* ── 进度条 ── */
+  .progress-wrap {
+    max-width: 640px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-text {
+    text-align: right;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  /* ── 卡片容器 ── */
+  .container {
+    max-width: 680px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 36px 32px;
+    margin-top: 20px;
+    box-shadow: var(--shadow);
+    display: none;
+  }
+  .card.active { display: block; animation: fadeUp 0.45s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--primary);
+  }
+  .card .subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* ── 选项 ── */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fefdfb;
+  }
+  .option:hover { border-color: var(--accent); background: #fdf7f2; }
+  .option.selected {
+    border-color: var(--primary);
+    background: #f5ede5;
+    box-shadow: 0 0 0 3px rgba(107, 76, 59, 0.08);
+  }
+  .option input[type="radio"],
+  .option input[type="checkbox"] { display: none; }
+  .option .dot {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    margin-right: 14px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .option .dot-checkbox {
+    border-radius: 5px;
+  }
+  .option.selected .dot {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .option.selected .dot::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .option.selected .dot-checkbox::after {
+    content: '✓';
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    background: none;
+    border-radius: 0;
+    width: auto; height: auto;
+  }
+  .option .label {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  /* ── 按钮 ── */
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn {
+    padding: 12px 32px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    flex: 1;
+  }
+  .btn-primary:hover { background: #5a3f2f; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--primary); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* ── 结果页 ── */
+  .result-section { margin-bottom: 24px; }
+  .result-section h3 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .badge-good  { background: #e6f4e6; color: #2d6a2d; }
+  .badge-warn  { background: #fef3cd; color: #856404; }
+  .badge-alert { background: #fde8e8; color: #b91c1c; }
+  .badge-info  { background: #e8f0fe; color: #1a56a8; }
+
+  .advice-card {
+    background: #fefdfb;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 8px 0;
+  }
+  .advice-card p { font-size: 0.9rem; color: var(--text); }
+  .advice-card .icon { font-size: 1.3rem; margin-right: 8px; }
+
+  .score-ring {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .ring {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .ring.good  { background: #e6f4e6; color: #2d6a2d; border: 4px solid #7a9e7e; }
+  .ring.warn  { background: #fef3cd; color: #856404; border: 4px solid #d4a017; }
+  .ring.alert { background: #fde8e8; color: #b91c1c; border: 4px solid #c0392b; }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 1.4rem; }
+    .card { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🦱 头发 · 头皮健康调查</h1>
+  <p>科学评估你的头发与头皮状态，获取个性化护发建议</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 / 12</div>
+</div>
+
+<div class="container" id="survey"></div>
+
+<script>
+// ── 问卷定义 ──
+const questions = [
+  {
+    id: 'gender', title: '您的性别是？', subtitle: '不同性别的脱发原因和护理重点差异很大',
+    type: 'single',
+    options: ['男', '女', '不愿透露']
+  },
+  {
+    id: 'age', title: '您的年龄段是？', subtitle: '不同年龄的头皮油脂分泌和代谢速度不同',
+    type: 'single',
+    options: ['18岁以下', '18-25岁', '26-35岁', '36-45岁', '46-55岁', '55岁以上']
+  },
+  {
+    id: 'hair_type', title: '您的发质类型是？', subtitle: '',
+    type: 'single',
+    options: ['油性（洗后1天就出油）', '中性（洗后2-3天出油）', '干性（洗后3天以上才出油）', '混合性（发根油、发尾干）', '不确定']
+  },
+  {
+    id: 'scalp_condition', title: '您的头皮通常有什么感觉？', subtitle: '可多选',
+    type: 'multi',
+    options: ['瘙痒', '紧绷感', '刺痛/灼烧感', '无明显不适', '有红肿/痘痘', '干燥脱屑']
+  },
+  {
+    id: 'dandruff', title: '您有头屑问题吗？', subtitle: '',
+    type: 'single',
+    options: ['完全没有', '偶尔有少量', '经常有，比较明显', '非常严重，大片脱落']
+  },
+  {
+    id: 'hair_loss', title: '您每天的掉发量大约是多少？', subtitle: '正常每天掉发50-100根属于生理性脱发',
+    type: 'single',
+    options: ['几乎不掉（<30根）', '正常范围（30-80根）', '偏多（80-150根）', '很多（>150根，明显稀疏）']
+  },
+  {
+    id: 'hair_loss_area', title: '掉发主要集中在哪个区域？', subtitle: '不同区域的脱发原因不同',
+    type: 'single',
+    options: ['整体均匀掉发', '头顶/发旋处', '前额发际线后退', '两侧鬓角', '没有明显规律', '无明显掉发']
+  },
+  {
+    id: 'oil_level', title: '头皮出油情况如何？', subtitle: '',
+    type: 'single',
+    options: ['洗完半天就油了', '洗完1天后出油', '洗完2天后出油', '不太出油', '说不清楚']
+  },
+  {
+    id: 'wash_freq', title: '您平均多久洗一次头？', subtitle: '',
+    type: 'single',
+    options: ['每天', '每隔1天', '每隔2-3天', '每隔4-5天', '每周1次或更少']
+  },
+  {
+    id: 'lifestyle', title: '您的生活习惯包括？（多选）', subtitle: '生活习惯直接影响头皮健康',
+    type: 'multi',
+    options: ['经常熬夜（23点后睡）', '饮食偏油腻/辛辣', '精神压力大', '经常染发/烫发', '抽烟', '饮酒较多', '经常戴帽子/头盔', '以上都没有']
+  },
+  {
+    id: 'family', title: '家族中是否有脱发史？', subtitle: '遗传是雄激素性脱发的最主要因素',
+    type: 'single',
+    options: ['父亲有脱发', '母亲有脱发', '父母双方都有', '父母都没有', '不清楚']
+  },
+  {
+    id: 'current_care', title: '您目前在用什么护发产品？', subtitle: '可多选',
+    type: 'multi',
+    options: ['普通洗发水', '防脱洗发水', '去屑洗发水', '控油洗发水', '护发素/发膜', '生发精华/米诺地尔', '口服药物', '没有特别护理']
+  }
+];
+
+let answers = {};
+let currentStep = 0;
+const totalSteps = questions.length + 1; // +1 for result page
+
+// ── 渲染题目 ──
+function renderQuestion(index) {
+  const container = document.getElementById('survey');
+  const q = questions[index];
+
+  const isMulti = q.type === 'multi';
+  const currentAnswers = answers[q.id] || (isMulti ? [] : null);
+
+  let optionsHTML = q.options.map((opt, i) => {
+    const selected = isMulti
+      ? (Array.isArray(currentAnswers) && currentAnswers.includes(opt))
+      : (currentAnswers === opt);
+    const dotClass = isMulti ? 'dot-checkbox' : '';
+    return `
+      <div class="option${selected ? ' selected' : ''}" data-value="${escapeAttr(opt)}">
+        <div class="dot ${dotClass}"></div>
+        <span class="label">${opt}</span>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="card active" id="card-${q.id}">
+      <h2>${index + 1}. ${q.title}</h2>
+      ${q.subtitle ? `<p class="subtitle">${q.subtitle}</p>` : ''}
+      <div class="options">
+        ${optionsHTML}
+      </div>
+      <div class="btn-row">
+        ${index > 0 ? '<button class="btn btn-secondary" id="btnPrev">← 上一题</button>' : ''}
+        <button class="btn btn-primary" id="btnNext" disabled>${index === questions.length - 1 ? '查看结果 ✨' : '下一题 →'}</button>
+      </div>
+    </div>`;
+
+  // 绑定事件
+  const options = container.querySelectorAll('.option');
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const val = opt.dataset.value;
+      if (isMulti) {
+        let arr = Array.isArray(answers[q.id]) ? [...answers[q.id]] : [];
+        if (arr.includes(val)) {
+          arr = arr.filter(v => v !== val);
+        } else {
+          arr.push(val);
+        }
+        answers[q.id] = arr;
+        // 刷新选项样式
+        container.querySelectorAll('.option').forEach(o => {
+          o.classList.toggle('selected', arr.includes(o.dataset.value));
+        });
+      } else {
+        answers[q.id] = val;
+        container.querySelectorAll('.option').forEach(o => {
+          o.classList.toggle('selected', o.dataset.value === val);
+        });
+      }
+      updateNextButton();
+    });
+  });
+
+  function updateNextButton() {
+    const btn = document.getElementById('btnNext');
+    const ans = answers[q.id];
+    const hasAnswer = isMulti ? (Array.isArray(ans) && ans.length > 0) : (ans != null);
+    btn.disabled = !hasAnswer;
+  }
+
+  updateNextButton();
+
+  document.getElementById('btnNext').addEventListener('click', () => {
+    if (index < questions.length - 1) {
+      currentStep = index + 1;
+      renderQuestion(currentStep);
+      updateProgress();
+    } else {
+      showResult();
+    }
+  });
+
+  const prevBtn = document.getElementById('btnPrev');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      currentStep = index - 1;
+      renderQuestion(currentStep);
+      updateProgress();
+    });
+  }
+
+  updateProgress();
+}
+
+// ── 进度条 ──
+function updateProgress() {
+  const pct = Math.round((currentStep / (totalSteps - 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${currentStep} / ${totalSteps - 1} 题`;
+}
+
+// ── 结果分析 ──
+function showResult() {
+  currentStep = totalSteps - 1;
+  updateProgress();
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressText').textContent = '完成 ✓';
+
+  const analysis = analyze(answers);
+  const container = document.getElementById('survey');
+
+  container.innerHTML = `
+    <div class="card active">
+      <h2>📋 您的头皮健康报告</h2>
+      <p class="subtitle">基于您的回答生成的个性化评估</p>
+
+      <div class="score-ring">
+        <div class="ring ${analysis.overall.level}">${analysis.overall.score}</div>
+        <div>
+          <strong style="font-size:1.1rem;">${analysis.overall.label}</strong>
+          <p style="color:var(--muted);margin-top:4px;font-size:0.85rem;">综合健康评分</p>
+        </div>
+      </div>
+
+      ${analysis.sections.map(s => `
+        <div class="result-section">
+          <h3>
+            ${s.icon} ${s.title}
+            <span class="badge ${s.badgeClass}">${s.badgeText}</span>
+          </h3>
+          ${s.items.map(item => `
+            <div class="advice-card">
+              <p><span class="icon">${item.icon}</span> ${item.text}</p>
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+
+      <div class="result-section" style="margin-top:24px; padding:20px; background:#fdf7f2; border-radius:14px; text-align:center;">
+        <p style="font-size:0.85rem; color:var(--muted);">⚠️ 本问卷仅供参考，不构成医疗建议。<br>如有严重的脱发或头皮问题，请及时就医皮肤科。</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="location.reload()">🔄 重新填写</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 打印报告</button>
+      </div>
+    </div>`;
+
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── 分析逻辑 ──
+function analyze(ans) {
+  const sections = [];
+  let totalScore = 100;
+
+  // 1. 出油评估
+  const oilLevel = ans.oil_level;
+  const hairType = ans.hair_type;
+  let oilScore = 100, oilLabel = '', oilBadge = '', oilItems = [];
+  if (oilLevel === '洗完半天就油了' || hairType === '油性（洗后1天就出油）') {
+    oilScore = 55; oilLabel = '油脂分泌旺盛'; oilBadge = 'badge-warn';
+    totalScore -= 15;
+    oilItems = [
+      { icon:'💡', text:'建议使用含<b>水杨酸、PCA锌</b>成分的控油洗发水' },
+      { icon:'🚿', text:'每天洗头是合适的，保持头皮清洁可减少毛囊堵塞' },
+      { icon:'🥗', text:'减少油腻、高糖食物摄入，多吃富含维生素B族的食物' },
+      { icon:'🧴', text:'避免含硅油的洗护产品，选择无硅油清爽配方' }
+    ];
+  } else if (oilLevel === '洗完1天后出油' || hairType === '中性（洗后2-3天出油）') {
+    oilScore = 80; oilLabel = '油脂分泌正常'; oilBadge = 'badge-good';
+    oilItems = [
+      { icon:'✅', text:'您的头皮出油处于正常范围，保持现有护理习惯即可' },
+      { icon:'💡', text:'建议选择温和的氨基酸类洗发水，不过度清洁' }
+    ];
+  } else if (oilLevel === '不太出油' || hairType === '干性（洗后3天以上才出油）') {
+    oilScore = 65; oilLabel = '油脂分泌不足'; oilBadge = 'badge-warn';
+    totalScore -= 10;
+    oilItems = [
+      { icon:'💧', text:'头皮偏干，建议使用含<b>甘油、透明质酸</b>的滋润型洗发水' },
+      { icon:'🚿', text:'减少洗头频率，2-3天一次即可，避免过度清洁' },
+      { icon:'🧴', text:'洗发后使用护发精华或头皮护理油按摩头皮' },
+      { icon:'💨', text:'洗头水温不宜过高，用温凉水冲洗有助于保护头皮屏障' }
+    ];
+  } else {
+    oilScore = 75; oilLabel = '需进一步观察'; oilBadge = 'badge-info';
+    oilItems = [{ icon:'🔍', text:'建议观察1-2周头皮出油规律，洗后半天/1天/2天的出油变化' }];
+  }
+
+  sections.push({ icon:'🛢️', title:'头皮出油评估', badgeText:oilLabel, badgeClass:oilBadge, items:oilItems });
+
+  // 2. 头屑评估
+  const dandruff = ans.dandruff;
+  let dandruffItems = [], dandruffLabel = '', dandruffBadge = '';
+  if (dandruff === '经常有，比较明显' || dandruff === '非常严重，大片脱落') {
+    dandruffLabel = '存在头屑问题'; dandruffBadge = 'badge-alert';
+    totalScore -= 15;
+    dandruffItems = [
+      { icon:'🧪', text:'建议使用含<b>酮康唑、二硫化硒、吡硫翁锌</b>的去屑洗发水，每周2-3次' },
+      { icon:'🔄', text:'多种去屑成分轮换使用，避免头皮产生耐受性' },
+      { icon:'🔬', text:'如果持续2周无改善，建议就医排查是否为<b>脂溢性皮炎或银屑病</b>' },
+      { icon:'🤚', text:'洗头时用指腹而非指甲按摩，避免抓伤头皮加重炎症' }
+    ];
+  } else if (dandruff === '偶尔有少量') {
+    dandruffLabel = '偶有轻微头屑'; dandruffBadge = 'badge-warn';
+    totalScore -= 5;
+    dandruffItems = [
+      { icon:'💡', text:'偶尔使用去屑洗发水预防，日常注意头皮清洁即可' },
+      { icon:'💧', text:'保持头皮不过于干燥，干燥也会导致脱屑增多' }
+    ];
+  } else {
+    dandruffLabel = '无头屑困扰'; dandruffBadge = 'badge-good';
+    dandruffItems = [{ icon:'✨', text:'头皮状态良好，继续维持当前的护理习惯' }];
+  }
+
+  sections.push({ icon:'❄️', title:'头屑评估', badgeText:dandruffLabel, badgeClass:dandruffBadge, items:dandruffItems });
+
+  // 3. 脱发评估
+  const hairLoss = ans.hair_loss;
+  const hairLossArea = ans.hair_loss_area;
+  const family = ans.family;
+  let lossLabel = '', lossBadge = '', lossItems = [];
+
+  if (hairLoss === '很多（>150根，明显稀疏）' || hairLoss === '偏多（80-150根）') {
+    lossLabel = '需关注脱发风险'; lossBadge = 'badge-alert';
+    totalScore -= 20;
+    lossItems = [
+      { icon:'🏥', text:'掉发量超出正常范围，<b>建议尽早就医皮肤科</b>进行毛囊镜检查' },
+      { icon:'💊', text:'医生可能建议：米诺地尔（外用）、非那雄胺（口服，仅限男性）等治疗方案' },
+      { icon:'⏰', text:'<b>越早干预效果越好</b>——毛囊闭合后药物难以逆转，只剩植发选项' },
+      { icon:'🧬', text: family !== '不清楚' && family !== '父母都没有' ? '您有家族脱发史，遗传因素可能性较大' : '建议关注是否与压力、营养、内分泌等因素有关' }
+    ];
+  } else if (hairLoss === '正常范围（30-80根）') {
+    if (hairLossArea === '头顶/发旋处' || hairLossArea === '前额发际线后退') {
+      lossLabel = '需警惕早期脱发'; lossBadge = 'badge-warn';
+      totalScore -= 10;
+      lossItems = [
+        { icon:'⚠️', text:'掉发量尚在正常范围，但<b>集中在特定区域需警惕</b>——可能是雄激素性脱发早期' },
+        { icon:'📸', text:'每月拍照记录发际线和发旋，对比观察是否有进行性稀疏' },
+        { icon:'🩺', text:'如有家族脱发史，可提前咨询皮肤科医生，早期使用米诺地尔预防' }
+      ];
+    } else {
+      lossLabel = '脱发正常'; lossBadge = 'badge-good';
+      lossItems = [
+        { icon:'✅', text:'掉发量在正常生理范围内，无需过度担心' },
+        { icon:'💡', text:'日常注意均衡营养、充足睡眠即可维持健康发量' }
+      ];
+    }
+  } else {
+    lossLabel = '脱发正常'; lossBadge = 'badge-good';
+    lossItems = [{ icon:'✨', text:'发量维持得很好，继续保持健康的生活习惯' }];
+  }
+
+  // 家族史提示
+  if ((family === '父亲有脱发' || family === '父母双方都有') && lossBadge !== 'badge-alert') {
+    lossItems.push({ icon:'🧬', text:'有家族脱发史，建议20岁后定期关注发际线变化，早预防早安心' });
+  }
+
+  sections.push({ icon:'💇', title:'脱发评估', badgeText:lossLabel, badgeClass:lossBadge, items:lossItems });
+
+  // 4. 头皮健康
+  const scalp = ans.scalp_condition;
+  let scalpLabel = '', scalpBadge = '', scalpItems = [];
+  const hasIssue = Array.isArray(scalp) && scalp.some(s => ['瘙痒','紧绷感','刺痛/灼烧感','有红肿/痘痘'].includes(s));
+
+  if (hasIssue) {
+    scalpLabel = '头皮屏障受损'; scalpBadge = 'badge-alert';
+    totalScore -= 15;
+    scalpItems = [
+      { icon:'🧴', text:'选择<b>无香精、无硫酸盐</b>的温和洗发水，减少对敏感头皮的刺激' },
+      { icon:'🚿', text:'水温控制在37°C左右，过热会破坏头皮屏障' },
+      { icon:'🩺', text:'如果瘙痒/红肿持续不消退，建议就医排查<b>毛囊炎、脂溢性皮炎</b>等' },
+      { icon:'🧘', text:'压力大也会诱发头皮问题，适当运动放松有助于改善' }
+    ];
+  } else if (Array.isArray(scalp) && scalp.includes('干燥脱屑')) {
+    scalpLabel = '头皮偏干'; scalpBadge = 'badge-warn';
+    totalScore -= 5;
+    scalpItems = [
+      { icon:'💧', text:'使用保湿型洗发产品，洗发后可涂抹头皮保湿精华' },
+      { icon:'🌿', text:'含<b>芦荟、泛醇（B5）、神经酰胺</b>成分的产品有助于修复头皮屏障' }
+    ];
+  } else {
+    scalpLabel = '头皮状态良好'; scalpBadge = 'badge-good';
+    scalpItems = [{ icon:'✅', text:'头皮没有明显不适，屏障功能健康' }];
+  }
+
+  sections.push({ icon:'🩺', title:'头皮健康评估', badgeText:scalpLabel, badgeClass:scalpBadge, items:scalpItems });
+
+  // 5. 生活习惯
+  const lifestyle = ans.lifestyle;
+  let lifeItems = [];
+  const badHabits = ['经常熬夜（23点后睡）','饮食偏油腻/辛辣','精神压力大','抽烟','饮酒较多'];
+  const userBadHabits = Array.isArray(lifestyle) ? lifestyle.filter(h => badHabits.includes(h)) : [];
+  const frequentDye = Array.isArray(lifestyle) && lifestyle.includes('经常染发/烫发');
+
+  if (userBadHabits.length >= 2 || frequentDye) {
+    totalScore -= 10;
+    if (userBadHabits.length >= 2) {
+      lifeItems.push({ icon:'🔄', text:'<b>熬夜、压力、高油饮食</b>是头皮出油和脱发的常见诱因，建议逐步调整' });
+    }
+    if (frequentDye) {
+      lifeItems.push({ icon:'🎨', text:'频繁染烫会损伤头皮和毛囊，建议<b>间隔至少3个月</b>，并选择温和配方' });
+    }
+    lifeItems.push({ icon:'😴', text:'保证每晚<b>7-8小时睡眠</b>，23点前入睡有助于激素平衡和毛囊修复' });
+    lifeItems.push({ icon:'🏃', text:'每周3次有氧运动，促进头皮血液循环' });
+  } else if (userBadHabits.length === 1) {
+    lifeItems.push({ icon:'💡', text:'有一个不良习惯，如果可以的话尝试调整，对头皮健康会有帮助' });
+  } else {
+    lifeItems.push({ icon:'🌟', text:'生活习惯良好，这是头发健康的重要保障！' });
+  }
+
+  sections.push({ icon:'🧘', title:'生活习惯建议', badgeText: userBadHabits.length >= 2 ? '需改善' : '良好', badgeClass: userBadHabits.length >= 2 ? 'badge-warn' : 'badge-good', items:lifeItems });
+
+  // 综合评分
+  totalScore = Math.max(30, Math.min(100, totalScore));
+  let overall;
+  if (totalScore >= 80) overall = { score: totalScore, level: 'good', label: '整体状况良好，继续保持！' };
+  else if (totalScore >= 55) overall = { score: totalScore, level: 'warn', label: '有一些需要关注的问题，建议针对性改善' };
+  else overall = { score: totalScore, level: 'alert', label: '建议尽早就医进行专业检查和治疗' };
+
+  return { overall, sections };
+}
+
+function escapeAttr(s) {
+  return s.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
+}
+
+// ── 启动 ──
+renderQuestion(0);
+</script>
+
+</body>
+</html>
